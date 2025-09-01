@@ -1,41 +1,26 @@
-// build.rs
-use std::env;
-use std::fs;
+use std::{env, fs};
 use std::path::Path;
 
+// build.rs
 fn main() {
-    println!("执行脚本");
-    println!("cargo:rerun-if-changed=src/lib.rs");
+    println!("cargo:warning=Build script is running");
+    println!("cargo:warning=Setting up Lua library linking");
+    println!("cargo:rustc-link-search=/dp2/lib");
+    println!("cargo:rustc-link-lib=lua53");
 
-    let target = env::var("TARGET").unwrap();
+    println!("cargo:rerun-if-changed=build.rs");
+
     let profile = env::var("PROFILE").unwrap();
+    if profile == "release" {
+        let target = env::var("TARGET").unwrap();
+        let src_path = format!("target/{}/librust_websocket.so", target);
+        let dst_path = format!("target/{}/rust_websocket.so", target);
 
-    println!("Build script running...");
-    println!("Target: {}", target);
-    println!("Profile: {}", profile);
-
-    // 注意：debug 和 release 的路径结构不同
-    let src_path = if profile == "release" {
-        format!("target/{}/{}/librust_websocket.so", target, profile)
-    } else {
-        format!("target/{}/librust_websocket.so", target)
-    };
-
-    let dst_path = if profile == "release" {
-        format!("target/{}/{}/rust_websocket.so", target, profile)
-    } else {
-        format!("target/{}/rust_websocket.so", target)
-    };
-
-    println!("Source path: {}", src_path);
-    println!("Destination path: {}", dst_path);
-
-    if Path::new(&src_path).exists() {
-        match fs::rename(&src_path, &dst_path) {
-            Ok(_) => println!("Successfully renamed file"),
-            Err(e) => println!("Failed to rename file: {}", e),
+        if Path::new(&src_path).exists() {
+            println!("cargo:warning=Copying {} to {}", src_path, dst_path);
+            let _ = fs::rename(&src_path, &dst_path);
+        } else {
+            println!("cargo:warning={} does not exist", src_path);
         }
-    } else {
-        println!("Source file does not exist");
     }
 }

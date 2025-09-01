@@ -7,8 +7,10 @@ edition = "2024"
 crate-type = ["cdylib"]
 
 [dependencies]
-tungstenite = "0.27.0"
+async-tungstenite = { version = "0.31.0", features = ["async-std-runtime"] }
 mlua = { version = "0.11.2", features = ["lua53","module"] }
+futures = "0.3.31"
+async-std = "1.13.2"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 libc = "1.0.0-alpha.1"

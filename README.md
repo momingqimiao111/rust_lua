@@ -11,7 +11,6 @@ client:poll_message(function (msg)
   print(msg)
 end)
 
--- 关闭连接
-client:disconnect()
+
 ```
 
